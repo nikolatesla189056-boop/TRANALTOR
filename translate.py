@@ -2,14 +2,15 @@ from groq import Groq
 import time
 import os
 
-# AAPKI SAARE 6 ACCOUNTS KI ACTIVE GROQ KEYS DIRECT CODE MEIN
+# AAPKI SAARE 7 ACCOUNTS KI NAYI ACTIVE GROQ KEYS DIRECT CODE MEIN
 GROQ_KEYS = [
-    "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",
-    "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",
-    "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",
-    "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",
-    "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",
-    "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"
+    "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",
+    "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",
+    "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",
+    "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",
+    "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",
+    "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",
+    "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"
 ]
 
 current_key_index = 0
@@ -36,23 +37,25 @@ def translate_batch(batch_items):
     
     while current_key_index < len(GROQ_KEYS):
         try:
+            # 🟢 FIXED: Aapki Playground settings wala modern active model mapping
             completion = client.chat.completions.create(
-                model="llama3-8b-8192", 
+                model="openai/gpt-oss-120b", 
                 messages=[{"role": "user", "content": prompt}],
-                temperature=0.3,
-                max_tokens=4000,
+                temperature=0.7,
+                max_completion_tokens=2048,
+                top_p=1,
+                stop=None,
+                stream=False
             )
             
-            if hasattr(completion.choices, 'message'):
-                response_text = completion.choices.message.content.strip()
-            else:
-                response_text = completion.choices['message']['content'].strip()
-                
+            response_text = completion.choices.message.content.strip()
             translated_lines = response_text.split('\n')
+            
             if len(translated_lines) == len(batch_items):
                 return [line.strip('"').strip("'") for line in translated_lines]
             return batch_items
         except Exception as e:
+            # 🔄 Key Exhaust handler (429 automatic rotation block)
             if "rate_limit_exceeded" in str(e).lower() or "429" in str(e):
                 current_key_index += 1
                 if current_key_index < len(GROQ_KEYS):
@@ -61,7 +64,7 @@ def translate_batch(batch_items):
                     time.sleep(2)
                     continue
                 else:
-                    print("\n❌ Error: Saari 6 API Keys ka quota khatam ho gaya hai!")
+                    print("\n❌ Error: Saari 7 API Keys ka quota khatam ho gaya hai!")
                     return None
             else:
                 print(f"\n⚠️ API Warning: {e}. Keeping original text.")
@@ -89,7 +92,6 @@ if os.path.exists(input_file):
             elif " " in line: parts = line.split(" ", 1)
             else: continue
             
-            # 🟢 FIXED: List filtering logic handle kiya bina 'strip' crash ke
             if len(parts) > 1:
                 content_text = parts[1].strip()
                 if content_text and not content_text.startswith("//"):
