@@ -88,9 +88,13 @@ if os.path.exists(input_file):
             if "\t" in line: parts = line.split("\t", 1)
             elif " " in line: parts = line.split(" ", 1)
             else: continue
-            if len(parts) > 1 and parts.strip() and not parts.strip().startswith("//"):
-                batch_items.append(line.strip())
-                batch_indices.append(idx)
+            
+            # 🟢 FIXED: List filtering logic handle kiya bina 'strip' crash ke
+            if len(parts) > 1:
+                content_text = parts[1].strip()
+                if content_text and not content_text.startswith("//"):
+                    batch_items.append(line.strip())
+                    batch_indices.append(idx)
 
     total_batches = (len(batch_items) + batch_size - 1) // batch_size
     print(f"📋 Total Dialogues Verified: {len(batch_items)} lines ({total_batches} batches).")
