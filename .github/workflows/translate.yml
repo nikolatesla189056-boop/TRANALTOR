@@ -1,7 +1,7 @@
 name: Max Payne 3 Auto Translator
 
 on:
-  workflow_dispatch: # Isse aap jab chahein manual play button daba kar run kar sakte hain
+  workflow_dispatch:
 
 jobs:
   translate:
@@ -20,8 +20,6 @@ jobs:
         pip install groq
 
     - name: Run Translation Script
-      env:
-        GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
       run: |
         python translate.py
 
